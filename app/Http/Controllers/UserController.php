@@ -58,4 +58,49 @@ Class UserController extends Controller {
         
         return $this->successResponse($user, Response::HTTP_CREATED);
     }
-}
+
+    public function show($id)
+    {
+    //$user = User::findOrFail($id);
+    $user = User::where('id', $id)->first();
+    if ($user){
+        return $this->successResponse($user);
+    }
+    {
+        return $this->errorResponse('User ID Does Not Exists', Response::HTTP_NOT_FOUND);
+    }
+    }
+
+    /**
+    * Update an existing author
+    * @return Illuminate\Http\Response
+    */
+    public function update(Request $request, $id){
+        $rules = [
+        'username' => 'max:20',
+        'password' => 'max:20',
+        'gender' => 'in:Male,Female',
+        ];
+        $this->validate($request, $rules);
+        $user = User::findOrFail($id);
+        $user->fill($request->all());
+        // if no changes happen
+        if ($user->isClean()) {
+            return $this->errorResponse('At least one value must
+            change', Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+            $user->save();
+            return $this->successResponse($user);
+            }
+
+    /**
+    * Remove an existing user
+    * @return Illuminate\Http\Response
+    */
+    public function delete($id)
+    {
+    $user = User::findOrFail($id);
+    $user->delete();
+    return $this->successResponse($user);
+    }
+    }
